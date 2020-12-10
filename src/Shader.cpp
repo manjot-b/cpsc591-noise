@@ -101,10 +101,10 @@ unsigned int Shader::getId() const
 	return id;
 }
 
-void Shader::setUniform1i(const char *uniform, int value) const
+void Shader::setUniform1iv(const char *uniform, int count, int* value) const
 {
 	GLint uniformLocation = glGetUniformLocation(id, uniform);
-	glUniform1i(uniformLocation, value);
+	glUniform1iv(uniformLocation, count, value);
 	logUniformError(uniformLocation, uniform);
 }
 

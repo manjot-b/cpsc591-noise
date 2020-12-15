@@ -8,10 +8,10 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 perspective;
 
-out vec2 modelPos;
+out vec3 modelPos;
 
 void main()
 {
     gl_Position = perspective * view * model * vec4(inPosition, 1.0);
-	modelPos = vec2(inPosition);
+	modelPos = inPosition;
 }

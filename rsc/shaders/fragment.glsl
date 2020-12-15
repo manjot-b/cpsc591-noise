@@ -74,8 +74,18 @@ float noise(vec2 vec)
 
 void main()
 {
-	float wiggle = 0.1;
-	float scale = 15;
-	fragColor = vec4(1.0f, 1.0f, 1.0f, 0.0f) * noise(modelPos * scale + wiggle);
+	// offset so we are not at (0,0). Noise function does not
+	// behave correctly near the origin.
+	float offset = 25;
+	float persistence = 6/16.0;
+	int octaves = 8;
+	float total = 0;
+	for (int i = 1; i < octaves; i++)
+	{
+		float freq = pow(2, i);
+		float amp = pow(persistence, i);
+		total += noise(modelPos * freq + offset) * amp;
+	}
+	fragColor = vec4(1.0f, 1.0f, 1.0f, 0.0f) * total;
 	//fragColor = vec4(1.0f, 1.0f, 1.0f, 0.0f);
 }

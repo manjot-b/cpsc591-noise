@@ -43,6 +43,7 @@ class Renderer
 		float deltaTime;
 		float lastFrame;
 
+		void shuffle(int perm[256], int seed);
 		void initWindow();
 		void loadModels(const char* modelDirectory);
 		void processWindowInput();

@@ -8,6 +8,16 @@ uniform int[256] perm;
 
 out vec4 fragColor;
 
+/**
+ *	Input a t in the range [0,1] and outputs
+ *	a smoothed values also in the range [0,1].
+ *	Uses the function 6t^5 - 15t^4 + 10t^3 
+ */
+float ease(float t)
+{
+	return ((6*t - 15)*t + 10)*t*t*t;
+}
+
 vec2 getGradientVector(int cornerValue)
 {
 	// return one of four gradient vectors.
@@ -63,9 +73,13 @@ float noise(vec2 vec)
 	float dotBotLeft = dot(botLeft, getGradientVector(valueBotLeft));
 
 	// Interpolate first vertically then horizontally.
-	float vert1 = mix(dotBotLeft, dotTopLeft, frac.y);
-	float vert2 = mix(dotBotRight, dotTopRight, frac.y);
-	float value = mix(vert1, vert2, frac.x);
+	// First ease the fractional values to create a smooth
+	// transistion between grids.
+	float u = ease(frac.x);
+	float v = ease(frac.y);
+	float vert1 = mix(dotBotLeft, dotTopLeft, v);
+	float vert2 = mix(dotBotRight, dotTopRight, v);
+	float value = mix(vert1, vert2, u);
 
 	// put in range [0,1]. -2 <= dotprod <= 2.
 	value = (value + 2.0) * 0.25;

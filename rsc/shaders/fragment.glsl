@@ -86,12 +86,12 @@ float noise(vec2 vec)
 	return value;
 }
 
-void main()
+vec4 grass()
 {
 	// offset so we are not at (0,0). Noise function does not
 	// behave correctly near the origin.
 	float offset = 25;
-	float persistence = 6/16.0;
+	float persistence = 7/16.0;
 	int octaves = 8;
 	float total = 0;
 	for (int i = 1; i < octaves; i++)
@@ -100,6 +100,21 @@ void main()
 		float amp = pow(persistence, i);
 		total += noise(modelPos * freq + offset) * amp;
 	}
-	fragColor = vec4(1.0f, 1.0f, 1.0f, 0.0f) * total;
-	//fragColor = vec4(1.0f, 1.0f, 1.0f, 0.0f);
+
+	vec4 green = vec4(0.133, 0.545, 0.133, 0.0);
+	vec4 brown = vec4(0.545, 0.271, 0.075, 0.0);
+	vec4 final;
+
+	// The persistance from the first octave will contribute
+	// the most to the total noise.
+	if (total < persistence * 0.80)
+		final = brown * total;
+	else
+		final = green * total;
+	return final;
+}
+
+void main()
+{
+	fragColor = grass();
 }

@@ -4,7 +4,7 @@
 
 in vec2 modelPos;
 
-uniform int[256] perm;
+uniform int[512] perm;
 
 out vec4 fragColor;
 
@@ -39,12 +39,12 @@ vec2 getGradientVector(int cornerValue)
 float noise(vec2 vec)
 {
 	// Get the lower left corner of the grid.
-	int xi = int(vec.x);	
-	int yi = int(vec.y);	
+	int xi = int(vec.x) & 255;
+	int yi = int(vec.y) & 255;
 
 	// Compute the vector pointing from the corner to the
 	// given point. Place the fractional part of point in [0,1]^2.
-	vec2 frac = vec - vec2(float(xi), float(yi));
+	vec2 frac = vec - vec2(int(vec.x), int(vec.y));
 
 	//if (frac.x < 0)
 	//	frac.x += 1.0f;
@@ -60,10 +60,10 @@ float noise(vec2 vec)
 
 	// Get a value from permuation matrix for the four
 	// corners of the grid cell. Take care to keep index in bounds.
-	int valueTopRight = perm[ (perm[(xi + 1) % 256] + yi + 1) % 256];
-	int valueTopLeft = perm[ (perm[xi % 256] + yi + 1) % 256];
-	int valueBotRight = perm[ (perm[(xi + 1) % 256] + yi) % 256];
-	int valueBotLeft = perm[ (perm[xi % 256] + yi) % 256];
+	int valueTopRight = perm[ perm[xi + 1] + yi + 1 ];
+	int valueTopLeft = perm[ perm[xi] + yi + 1 ];
+	int valueBotRight = perm[ perm[xi + 1] + yi ];
+	int valueBotLeft = perm[ perm[xi] + yi ];
 
 	// Take the dot between the vector from corner to point and
 	// the gradient vector of the corner.

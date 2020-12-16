@@ -208,7 +208,33 @@ vec4 grass()
 	return final;
 }
 
+vec4 wood()
+{
+	float offset = 25;
+	float persistence = 2/16.0;
+	int octaves = 3;
+	float turbulence = 0;
+	for (int i = 0; i < octaves; i++)
+	{
+		float freq = pow(2, i);
+		float amp = pow(persistence, i);
+		turbulence += noise(modelPos * freq + offset) * amp;
+	}
+	// Add some turbulance to the distance so that we get curvy rings.
+	float dist = length(modelPos.xz) + turbulence;
+	float value = (cos(dist * 80) + 1 ) * 0.5f;
+	value = pow(value, 3);
+	//value = clamp(1-value, 0.5f, 1.0f);
+
+	vec3 light = vec3(0.2941, 0.2118, 0.1294);
+	vec3 dark = vec3(0.1686, 0.1176, 0.0863);
+	return vec4(mix(light, dark, value), 0);
+	
+	//float g = noise(modelPos * 5 + 25) * 10;
+	//return vec4(0.2941, 0.2118, 0.1294, 0) * (g - int(g));
+}
+
 void main()
 {
-	fragColor = grass();
+	fragColor = wood();
 }

@@ -180,61 +180,56 @@ float noise(vec3 vec)
 	return value;
 }
 
-vec4 grass()
+/**
+ * Create turbulence at the given point. The higher the persistance
+ * the more turbulence is generated. The higher the octaves the smoother
+ * the final turbulance will be.
+ */
+float turbulence(vec3 vec, float persistence, int octaves, int start, float offset)
 {
 	// offset so we are not at (0,0). Noise function does not
 	// behave correctly near the origin.
-	float offset = 25;
-	float persistence = 7/16.0;
-	int octaves = 8;
 	float total = 0;
-	for (int i = 1; i < octaves; i++)
+	for (int i = start; i < octaves; i++)
 	{
 		float freq = pow(2, i);
 		float amp = pow(persistence, i);
 		total += noise(modelPos * freq + offset) * amp;
 	}
+	return total;
+}
 
+vec4 grass()
+{
 	vec4 green = vec4(0.133, 0.545, 0.133, 0.0);
 	vec4 brown = vec4(0.545, 0.271, 0.075, 0.0);
 	vec4 final;
 
+	float persistence = 7/16.0f;
+	float turbulence = turbulence(modelPos, persistence, 8, 1, 25);
 	// The persistance from the first octave will contribute
 	// the most to the total noise.
-	if (total < persistence * 0.80)
-		final = brown * total;
+	if (turbulence < persistence * 0.80)
+		final = brown * turbulence;
 	else
-		final = green * total;
+		final = green * turbulence;
 	return final;
 }
 
 vec4 wood()
 {
-	float offset = 25;
-	float persistence = 2/16.0;
-	int octaves = 3;
-	float turbulence = 0;
-	for (int i = 0; i < octaves; i++)
-	{
-		float freq = pow(2, i);
-		float amp = pow(persistence, i);
-		turbulence += noise(modelPos * freq + offset) * amp;
-	}
 	// Add some turbulance to the distance so that we get curvy rings.
+	float turbulence = turbulence(modelPos, 2/16.0, 3, 0, 25);
 	float dist = length(modelPos.xz) + turbulence;
 	float value = (cos(dist * 80) + 1 ) * 0.5f;
 	value = pow(value, 3);
-	//value = clamp(1-value, 0.5f, 1.0f);
 
 	vec3 light = vec3(0.2941, 0.2118, 0.1294);
 	vec3 dark = vec3(0.1686, 0.1176, 0.0863);
 	return vec4(mix(light, dark, value), 0);
-	
-	//float g = noise(modelPos * 5 + 25) * 10;
-	//return vec4(0.2941, 0.2118, 0.1294, 0) * (g - int(g));
 }
 
 void main()
 {
-	fragColor = wood();
+	fragColor = grass();
 }

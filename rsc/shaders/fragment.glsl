@@ -4,6 +4,8 @@
 #define SQRT3 1.73205080757
 
 in vec3 modelPos;
+in vec3 normal;
+in vec3 toLight;
 
 uniform int[512] perm;
 
@@ -231,5 +233,9 @@ vec4 wood()
 
 void main()
 {
-	fragColor = grass();
+	float diffuseBrightness = max(dot(normal, toLight), 0);
+	vec3 diffuse = vec3(1.0) * diffuseBrightness;
+	vec3 ambient = vec3(0.5);
+	vec4 totalLight = vec4(ambient + diffuse, 1);
+	fragColor = wood() * totalLight;
 }

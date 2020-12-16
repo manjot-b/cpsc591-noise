@@ -24,6 +24,9 @@ Renderer::Renderer(const char* modelDirectory) :
 	shader->setUniformMatrix4fv("perspective", perspective);
 	shader->setUniformMatrix4fv("view", camera.getViewMatrix());
 
+	glm::vec3 lightPos = glm::vec3(-2.0, 3.0, 2.0);
+	shader->setUniform3fv("lightPos", lightPos);
+
 	texture = std::make_unique<Texture>("images/tree.jpeg");
 
 	int perm[256];

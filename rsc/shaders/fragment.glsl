@@ -183,6 +183,30 @@ float noise(vec3 vec)
 }
 
 /**
+ * Computes the instantaneous rate of change of the noise function at
+ * the given point.
+ */
+vec3 diffNoise(vec3 vec)
+{
+	float h = 0.0001;
+	// Use the centered difference formula to compute the partial
+	// derivative at each component.
+	vec3 x1 = vec + vec3(h,0,0);
+	vec3 x2 = vec + vec3(-h,0,0);
+	float dx = (noise(x1) - noise(x2))/(2*h);
+
+	vec3 y1 = vec + vec3(0,h,0);
+	vec3 y2 = vec + vec3(0,-h,0);
+	float dy = (noise(y1) - noise(y2))/(2*h);
+
+	vec3 z1 = vec + vec3(0,0,h);
+	vec3 z2 = vec + vec3(0,0,-h);
+	float dz = (noise(z1) - noise(z2))/(2*h);
+
+	return vec3(dx, dy, dz);
+}
+
+/**
  * Create turbulence at the given point. The higher the persistance
  * the more turbulence is generated. The higher the octaves the smoother
  * the final turbulance will be.
@@ -197,6 +221,24 @@ float turbulence(vec3 vec, float persistence, int octaves, int start, float offs
 		float freq = pow(2, i);
 		float amp = pow(persistence, i);
 		total += noise(modelPos * freq + offset) * amp;
+	}
+	return total;
+}
+
+/**
+ * Same as the normal turbulence function but uses the differential of the noise
+ * function rather than the noise function directly to return the gradient at the
+ * given point.
+ */
+vec3 diffTurbulence(vec3 vec, int octaves, int start, float offset)
+{
+	// offset so we are not at (0,0). Noise function does not
+	// behave correctly near the origin.
+	vec3 total = vec3(0);
+	for (int i = start; i < octaves; i++)
+	{
+		float freq = pow(2, i);
+		total += diffNoise(modelPos * freq + offset);
 	}
 	return total;
 }
@@ -233,9 +275,13 @@ vec4 wood()
 
 void main()
 {
-	float diffuseBrightness = max(dot(normal, toLight), 0);
+	vec3 noiseNormal = diffTurbulence(modelPos, 4, 1, 0);
+	noiseNormal = normalize(normal + noiseNormal);
+	float diffuseBrightness = max(dot(noiseNormal, toLight), 0);
 	vec3 diffuse = vec3(1.0) * diffuseBrightness;
-	vec3 ambient = vec3(0.5);
+	vec3 ambient = vec3(0.3);
 	vec4 totalLight = vec4(ambient + diffuse, 1);
-	fragColor = wood() * totalLight;
+	fragColor = grass() * totalLight;
+
+	//fragColor = vec4(noiseNormal, 0);
 }

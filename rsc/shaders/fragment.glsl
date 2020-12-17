@@ -8,6 +8,7 @@ in vec3 normal;
 in vec3 toLight;
 
 uniform int[512] perm;
+uniform float time;
 
 out vec4 fragColor;
 
@@ -273,15 +274,43 @@ vec4 wood()
 	return vec4(mix(light, dark, value), 0);
 }
 
+vec3 waves(vec3 vec)
+{
+	vec3[8] centers;
+	float[8] freqs;
+	float maxFreq = 20;
+	float minFreq = 10;
+
+	for (int i = 0; i < 8; i++)
+	{
+		centers[i] = normalize(diffNoise(i * vec3(100,0,0)));
+		freqs[i] = noise(vec2(i+0.12, i+0.21)) * maxFreq * 0.5 + minFreq;
+	}
+
+	float phaseSpeed = 1.5;
+
+	vec3 displacement = vec3(0);
+
+	for (int i = 0; i < 8; i++)
+	{
+		vec3 toPoint = vec - centers[i];
+		displacement += normalize(toPoint) * cos(length(toPoint)*freqs[i] + time*phaseSpeed) * 0.1;
+	}
+	return displacement;
+}
+
 void main()
 {
-	vec3 noiseNormal = diffTurbulence(modelPos, 4, 1, 0);
-	noiseNormal = normalize(normal + noiseNormal);
-	float diffuseBrightness = max(dot(noiseNormal, toLight), 0);
+	//vec3 noiseNormal = diffTurbulence(modelPos, 4, 1, 0);
+	//noiseNormal = normalize(normal + noiseNormal);
+	
+	vec3 waveNormal = normal - waves(modelPos);
+
+	float diffuseBrightness = max(dot(waveNormal, toLight), 0);
 	vec3 diffuse = vec3(1.0) * diffuseBrightness;
 	vec3 ambient = vec3(0.3);
 	vec4 totalLight = vec4(ambient + diffuse, 1);
-	fragColor = grass() * totalLight;
+	fragColor = vec4(0.1, 0.5, 0.8, 0.5) * totalLight;
 
-	//fragColor = vec4(noiseNormal, 0);
+	//fragColor = vec4(waveNormal, 0);
 }

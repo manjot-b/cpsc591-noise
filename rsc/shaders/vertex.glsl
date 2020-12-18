@@ -18,6 +18,6 @@ void main()
 	vec4 worldPos = model * vec4(inPosition, 1.0);
     gl_Position = perspective * view * worldPos;
 	modelPos = inPosition;
-	normal = normalize((model * vec4(inNormal, 0)).xyz);
-	toLight = normalize(lightPos - worldPos.xyz);
+	normal = (model * vec4(inNormal, 0)).xyz;
+	toLight = lightPos - worldPos.xyz;
 }

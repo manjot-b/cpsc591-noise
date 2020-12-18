@@ -9,6 +9,7 @@ in vec3 toLight;
 
 uniform int[512] perm;
 uniform float time;
+uniform vec3 toCamera;
 
 out vec4 fragColor;
 
@@ -287,14 +288,14 @@ vec3 waves(vec3 vec)
 		freqs[i] = noise(vec2(i+0.12, i+0.21)) * maxFreq * 0.5 + minFreq;
 	}
 
-	float phaseSpeed = 1.5;
+	float phaseSpeed = 1.8;
 
 	vec3 displacement = vec3(0);
 
 	for (int i = 0; i < 8; i++)
 	{
 		vec3 toPoint = vec - centers[i];
-		displacement += normalize(toPoint) * cos(length(toPoint)*freqs[i] + time*phaseSpeed) * 0.1;
+		displacement += normalize(toPoint) * cos(length(toPoint)*freqs[i] + time*phaseSpeed) /freqs[i];
 	}
 	return displacement;
 }
@@ -304,13 +305,26 @@ void main()
 	//vec3 noiseNormal = diffTurbulence(modelPos, 4, 1, 0);
 	//noiseNormal = normalize(normal + noiseNormal);
 	
-	vec3 waveNormal = normal - waves(modelPos);
+	vec3 unitToCamera = normalize(toCamera);
+	vec3 unitToLight = normalize(toLight);
+	vec3 unitNormal = normalize(normal);
+	vec3 waveNormal = normalize(unitNormal + waves(modelPos));
 
-	float diffuseBrightness = max(dot(waveNormal, toLight), 0);
-	vec3 diffuse = vec3(1.0) * diffuseBrightness;
 	vec3 ambient = vec3(0.3);
-	vec4 totalLight = vec4(ambient + diffuse, 1);
-	fragColor = vec4(0.1, 0.5, 0.8, 0.5) * totalLight;
 
-	//fragColor = vec4(waveNormal, 0);
+	float diffuseBrightness = max(dot(waveNormal, unitToLight), 0);
+	vec3 diffuse = vec3(1.0) * diffuseBrightness;
+
+	float shininess = 32;
+	float specularCoeff = 0.5;
+	vec3 refl = 2 * dot(unitToLight, waveNormal) * waveNormal - unitToLight;
+	refl = normalize(refl);
+	float specularFactor = max(dot(refl, unitToCamera), 0);
+	float dampedFactor = pow(specularFactor, shininess);
+	vec3 specular = dampedFactor * specularCoeff * vec3(1.0);
+
+	vec4 totalLight = vec4(ambient + diffuse , 1);
+	fragColor = vec4(0.1, 0.5, 0.8, 0.5) * totalLight + vec4(specular,0);
+
+	//fragColor = vec4(waveNormal, 1);
 }

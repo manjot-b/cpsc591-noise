@@ -24,7 +24,7 @@ Renderer::Renderer(const char* modelDirectory) :
 	shader->setUniformMatrix4fv("perspective", perspective);
 	shader->setUniformMatrix4fv("view", camera.getViewMatrix());
 
-	glm::vec3 lightPos = glm::vec3(-2.0, 3.0, 2.0);
+	glm::vec3 lightPos = glm::vec3(-2.0, 5.0, 3.0);
 	shader->setUniform3fv("lightPos", lightPos);
 
 	texture = std::make_unique<Texture>("images/tree.jpeg");
@@ -136,6 +136,7 @@ void Renderer::run()
 		shader->setUniformMatrix4fv("view", camera.getViewMatrix());
 		shader->setUniformMatrix4fv("perspective", perspective);
 		shader->setUniform1f("time", currentFrame);
+		shader->setUniform3fv("toCamera", camera.getPosition());
 
 		models[modelIndex]->rotate(rotate);
 		models[modelIndex]->scale(scale);

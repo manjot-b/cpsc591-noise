@@ -253,11 +253,12 @@ vec4 grass()
 	vec3 final;
 
 	float persistence = 7/16.0f;
-	float turbulence = turbulence(modelPos, persistence, 8, 1, 25);
+	float turbulence = turbulence(modelPos, persistence, 4, 1, 25);
 	// The persistance from the first octave will contribute
 	// the most to the total noise.
-	if (turbulence < persistence * 0.80)
+	if (turbulence < persistence * 0.75)
 		final = brown * turbulence;
+		//final = mix(brown, green, turbulence);
 	else
 		final = green * turbulence;
 	return vec4(final, 1);

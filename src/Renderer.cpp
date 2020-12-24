@@ -262,6 +262,13 @@ void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action
 			// Select model
 			case GLFW_KEY_1:
 			case GLFW_KEY_2:
+			case GLFW_KEY_3:
+			case GLFW_KEY_4:
+			case GLFW_KEY_5:
+			case GLFW_KEY_6:
+			case GLFW_KEY_7:
+			case GLFW_KEY_8:
+			case GLFW_KEY_9:
 				renderer->modelIndex = key - GLFW_KEY_1;
 				break;
 		}

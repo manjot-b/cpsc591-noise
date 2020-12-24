@@ -27,14 +27,14 @@ Renderer::Renderer(const char* modelDirectory) :
 	glm::vec3 lightPos = glm::vec3(-2.0, 5.0, 3.0);
 	shader->setUniform3fv("lightPos", lightPos);
 
-	texture = std::make_unique<Texture>("images/tree.jpeg");
-
 	int perm[256];
 	for (unsigned int i = 0; i < 256; i++)
 		perm[i] = i;
 	shuffle(perm, 110);
 	shader->setUniform1iv("perm", 256, perm);
 	shader->setUniform1iv("perm[256]", 256, perm);
+
+	shader->setUniform1i("effect", 0);
 
 	glUseProgram(0);	// unbind shader
 }

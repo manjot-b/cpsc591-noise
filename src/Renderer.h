@@ -23,7 +23,6 @@ class Renderer
 	private:
 		GLFWwindow* window;
 		std::unique_ptr<Shader> shader;
-		std::unique_ptr<Texture> texture;
 		std::vector<std::unique_ptr<Model>> models;
 		unsigned int modelIndex;
 		

@@ -108,6 +108,13 @@ void Shader::setUniform1iv(const char *uniform, int count, int* value) const
 	logUniformError(uniformLocation, uniform);
 }
 
+void Shader::setUniform1i(const char *uniform, int value) const
+{
+	GLint uniformLocation = glGetUniformLocation(id, uniform);
+	glUniform1i(uniformLocation, value);
+	logUniformError(uniformLocation, uniform);
+}
+
 void Shader::setUniform1f(const char *uniform, float value) const
 {
 	GLint uniformLocation = glGetUniformLocation(id, uniform);

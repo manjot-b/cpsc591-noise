@@ -10,6 +10,7 @@ in vec3 toLight;
 uniform int[512] perm;
 uniform float time;
 uniform vec3 toCamera;
+uniform int effect;	// Chooses a perlin texture to apply.
 
 out vec4 fragColor;
 
@@ -247,9 +248,9 @@ vec3 diffTurbulence(vec3 vec, int octaves, int start, float offset)
 
 vec4 grass()
 {
-	vec4 green = vec4(0.133, 0.545, 0.133, 0.0);
-	vec4 brown = vec4(0.545, 0.271, 0.075, 0.0);
-	vec4 final;
+	vec3 green = vec3(0.133, 0.545, 0.133);
+	vec3 brown = vec3(0.545, 0.271, 0.075);
+	vec3 final;
 
 	float persistence = 7/16.0f;
 	float turbulence = turbulence(modelPos, persistence, 8, 1, 25);
@@ -259,7 +260,7 @@ vec4 grass()
 		final = brown * turbulence;
 	else
 		final = green * turbulence;
-	return final;
+	return vec4(final, 1);
 }
 
 vec4 wood()
@@ -272,7 +273,7 @@ vec4 wood()
 
 	vec3 light = vec3(0.2941, 0.2118, 0.1294);
 	vec3 dark = vec3(0.1686, 0.1176, 0.0863);
-	return vec4(mix(light, dark, value), 0);
+	return vec4(mix(light, dark, value), 1);
 }
 
 vec3 waves(vec3 vec)
@@ -302,29 +303,44 @@ vec3 waves(vec3 vec)
 
 void main()
 {
-	//vec3 noiseNormal = diffTurbulence(modelPos, 4, 1, 0);
-	//noiseNormal = normalize(normal + noiseNormal);
-	
 	vec3 unitToCamera = normalize(toCamera);
 	vec3 unitToLight = normalize(toLight);
 	vec3 unitNormal = normalize(normal);
-	vec3 waveNormal = normalize(unitNormal + waves(modelPos));
 
 	vec3 ambient = vec3(0.3);
 
-	float diffuseBrightness = max(dot(waveNormal, unitToLight), 0);
+	float diffuseBrightness = max(dot(unitNormal, unitToLight), 0);
 	vec3 diffuse = vec3(1.0) * diffuseBrightness;
 
-	float shininess = 32;
-	float specularCoeff = 0.5;
-	vec3 refl = 2 * dot(unitToLight, waveNormal) * waveNormal - unitToLight;
-	refl = normalize(refl);
-	float specularFactor = max(dot(refl, unitToCamera), 0);
-	float dampedFactor = pow(specularFactor, shininess);
-	vec3 specular = dampedFactor * specularCoeff * vec3(1.0);
+	vec3 specular = vec3(0);
+
+	vec4 textureCol;
+
+	if (effect == 0)	// terrain
+	{
+		textureCol = grass();
+	}
+	else if (effect == 1)	// wood
+	{
+		textureCol = wood();
+	}
+	else					// water
+	{
+		textureCol = vec4(0.1, 0.5, 0.8, 0.5);	// blue
+		// Add some noise to the normal vector but keep it cyclic.
+		vec3 waveNormal = normalize(unitNormal + waves(modelPos));
+		diffuseBrightness = max(dot(waveNormal, unitToLight), 0);
+		diffuse = vec3(1.0) * diffuseBrightness;
+
+		float shininess = 32;
+		float specularCoeff = 0.5;
+		vec3 refl = 2 * dot(unitToLight, waveNormal) * waveNormal - unitToLight;
+		refl = normalize(refl);
+		float specularFactor = max(dot(refl, unitToCamera), 0);
+		float dampedFactor = pow(specularFactor, shininess);
+		specular = dampedFactor * specularCoeff * vec3(1.0);
+	}
 
 	vec4 totalLight = vec4(ambient + diffuse , 1);
-	fragColor = vec4(0.1, 0.5, 0.8, 0.5) * totalLight + vec4(specular,0);
-
-	//fragColor = vec4(waveNormal, 1);
+	fragColor = textureCol * totalLight + vec4(specular,0);
 }

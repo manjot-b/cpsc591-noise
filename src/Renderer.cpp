@@ -10,7 +10,7 @@
 #include "Renderer.h"
 
 Renderer::Renderer() :
-	rotate(0), scale(1),
+	rotate(0), scale(1), camera(glm::vec3(0,5,12)),
 	firstMouse(true), lastX(width / 2.0f), lastY(height / 2.0f),
 	shiftPressed(false), deltaTime(0.0f), lastFrame(0.0f)
 {
@@ -25,7 +25,7 @@ Renderer::Renderer() :
 	shader->setUniformMatrix4fv("perspective", perspective);
 	shader->setUniformMatrix4fv("view", camera.getViewMatrix());
 
-	glm::vec3 lightPos = glm::vec3(-2.0, 5.0, 3.0);
+	glm::vec3 lightPos = glm::vec3(5.0, 25.0, -20.0);
 	shader->setUniform3fv("lightPos", lightPos);
 
 	int perm[256];
@@ -132,11 +132,28 @@ void Renderer::loadModels()
 
 void Renderer::setupModels()
 {
+	// Water
 	water->fragmentSettings.noiseEffect = Model::NoiseType::WATER;
-	terrain->fragmentSettings.noiseEffect = Model::NoiseType::GRASS;
+	water->scale(20);
+	water->translate(glm::vec3(0,-2.77,0));
 
+	// Terrain
+	terrain->fragmentSettings.noiseEffect = Model::NoiseType::GRASS;
+	terrain->scale(10);
+
+	// Logs
 	for(auto& log : logs)
 		log->fragmentSettings.noiseEffect = Model::NoiseType::WOOD;
+
+	logs[0]->scale(0.5);
+	logs[0]->translate(glm::vec3(-7,1,0));
+	logs[1]->scale(0.40);
+	logs[1]->translate(glm::vec3(-3,1.5,15));
+	logs[2]->scale(0.35);
+	logs[2]->translate(glm::vec3(14,2.15,5));
+
+	for(auto& model : models)
+		model->update();
 }
 
 void Renderer::run()

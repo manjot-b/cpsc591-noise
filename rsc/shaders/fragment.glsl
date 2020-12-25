@@ -308,7 +308,7 @@ void main()
 	vec3 unitToLight = normalize(toLight);
 	vec3 unitNormal = normalize(normal);
 
-	vec3 ambient = vec3(0.3);
+	vec3 ambient = vec3(0.4);
 
 	float diffuseBrightness = max(dot(unitNormal, unitToLight), 0);
 	vec3 diffuse = vec3(1.0) * diffuseBrightness;

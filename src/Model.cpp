@@ -9,7 +9,7 @@
 #include "Model.h"
 
 Model::Model(const std::string &objPath) :
-	 modelMatrix(1.0f), m_rotate(0), m_scale(1), m_translation(0)
+	 modelMatrix(1.0f), m_rotate(0), m_scale(1), m_translate(0)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(objPath,
@@ -72,12 +72,12 @@ void Model::draw(const Shader& shader) const
 void Model::update()
 {
 	// Apply transformations
-	modelMatrix = glm::translate(modelMatrix, m_translation);
+	modelMatrix = glm::translate(modelMatrix, m_translate);
 	modelMatrix = modelMatrix * glm::eulerAngleXYZ(m_rotate.x, m_rotate.y, m_rotate.z);
 	modelMatrix = glm::scale(modelMatrix, glm::vec3(m_scale, m_scale, m_scale));
 
 	// Reset transformation values
-	m_translation = glm::vec3(0);
+	m_translate = glm::vec3(0);
 	m_rotate = glm::vec3(0);
 	m_scale = 1;
 }
@@ -104,6 +104,11 @@ void Model::rotate(const glm::vec3 &rotate)
 void Model::scale(const float scale)
 {
 	m_scale = scale;
+}
+
+void Model::translate(const glm::vec3 &translate)
+{
+	m_translate = translate;
 }
 
 /**
@@ -145,7 +150,7 @@ void Model::scaleToViewport()
 	float xTrans = -(boundingBox.x + boundingBox.width*0.5f) * m_scale;
 	float yTrans = -(boundingBox.y + boundingBox.height*0.5f) * m_scale;
 	float zTrans = -(boundingBox.z + boundingBox.depth*0.5f) * m_scale;
-	m_translation = glm::vec3(xTrans, yTrans, zTrans);
+	m_translate = glm::vec3(xTrans, yTrans, zTrans);
 	update();
 }
 

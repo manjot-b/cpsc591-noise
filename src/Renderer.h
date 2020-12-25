@@ -16,15 +16,17 @@
 class Renderer
 {
 	public:
-		Renderer(const char* modelDirectory);
+		Renderer();
 		~Renderer();
 		void run();
 
 	private:
 		GLFWwindow* window;
-		std::unique_ptr<Shader> shader;
-		std::vector<std::unique_ptr<Model>> models;
-		unsigned int modelIndex;
+		std::shared_ptr<Shader> shader;
+		std::shared_ptr<Model> terrain;
+		std::shared_ptr<Model> water;
+		std::vector<std::shared_ptr<Model>> logs;
+		std::vector<std::shared_ptr<Model>> models;
 		
 		const unsigned int height = 800;
 		const unsigned int width = 800;
@@ -44,7 +46,7 @@ class Renderer
 
 		void shuffle(int perm[256], int seed);
 		void initWindow();
-		void loadModels(const char* modelDirectory);
+		void loadModels();
 		void processWindowInput();
 		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void mouseCallback(GLFWwindow* window, double xpos, double ypos);

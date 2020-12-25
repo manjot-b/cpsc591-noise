@@ -9,15 +9,15 @@
 
 #include "Renderer.h"
 
-Renderer::Renderer(const char* modelDirectory) :
-	modelIndex(0), rotate(0), scale(1),
+Renderer::Renderer() :
+	rotate(0), scale(1),
 	firstMouse(true), lastX(width / 2.0f), lastY(height / 2.0f),
 	shiftPressed(false), deltaTime(0.0f), lastFrame(0.0f)
 {
 	initWindow();
 	shader = std::make_unique<Shader>("shaders/vertex.glsl", "shaders/fragment.glsl");
 	shader->link();
-	loadModels(modelDirectory);	
+	loadModels();	
 	
 	perspective = glm::perspective(glm::radians(45.0f), float(width)/height, 0.1f, 100.0f);
 	shader->use();
@@ -100,21 +100,34 @@ void Renderer::initWindow()
 
 }
 
-void Renderer::loadModels(const char* modelDirectory)
+void Renderer::loadModels()
 {
 	namespace fs = std::filesystem;
-	const std::string extension = ".obj";
+	const std::string dir = "models/";
+	const std::string logPath = dir + "log.obj";
+	const std::string terrainPath = dir + "terrain-3.obj";
+	const std::string waterPath = dir + "water.obj";
 
-	unsigned int count = 1;
-	for (const auto& entry : fs::directory_iterator(modelDirectory))
+	unsigned int logCount = 3;
+	for (unsigned int i = 0; i < logCount; i++)
 	{
-		if (entry.is_regular_file() && entry.path().extension() == extension)
-		{
-			std::cout << "Loading " << entry.path() << "..." << std::flush;
-			models.push_back(std::make_unique<Model>(entry.path()));
-			std::cout << "Done! Index: " << count << "\n";
-			count++;
-		}
+		std::cout << "Loading " << logPath << "..." << std::flush;
+		logs.push_back(std::make_unique<Model>(logPath));
+		std::cout << "Done!\n"; 
+	}
+	std::cout << "Loading " << waterPath << "..." << std::flush;
+	water = std::make_unique<Model>(waterPath);
+	std::cout << "Done!\n"; 
+
+	std::cout << "Loading " << terrainPath << "..." << std::flush;
+	terrain = std::make_unique<Model>(terrainPath);
+	std::cout << "Done!\n"; 
+
+	models.push_back(water);
+	models.push_back(terrain);
+	for (unsigned int i = 0; i < logCount; i++)
+	{
+		models.push_back(logs[i]);
 	}
 }
 
@@ -138,10 +151,13 @@ void Renderer::run()
 		shader->setUniform1f("time", currentFrame);
 		shader->setUniform3fv("toCamera", camera.getPosition());
 
-		models[modelIndex]->rotate(rotate);
-		models[modelIndex]->scale(scale);
-		models[modelIndex]->update();
-		models[modelIndex]->draw(*shader);
+		for (auto& model : models)
+		{
+			model->rotate(rotate);
+			model->scale(scale);
+			model->update();
+			model->draw(*shader);
+		}
 
 		glUseProgram(0);
 
@@ -249,7 +265,7 @@ void Renderer::processWindowInput()
  */ 
 void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+	//Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
 	
 	if (action == GLFW_PRESS)
 	{
@@ -269,7 +285,7 @@ void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action
 			case GLFW_KEY_7:
 			case GLFW_KEY_8:
 			case GLFW_KEY_9:
-				renderer->modelIndex = key - GLFW_KEY_1;
+				//renderer->modelIndex = key - GLFW_KEY_1;
 				break;
 		}
 	}

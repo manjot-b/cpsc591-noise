@@ -58,7 +58,7 @@ void Model::extractDataFromNode(const aiScene* scene, const aiNode* node)
  */
 void Model::draw(const Shader& shader) const
 {
-	shader.setUniformMatrix4fv("model", modelMatrix);
+	sendUniforms(shader);
 
 	for(auto &mesh : meshes)
 	{
@@ -80,6 +80,16 @@ void Model::update()
 	m_translation = glm::vec3(0);
 	m_rotate = glm::vec3(0);
 	m_scale = 1;
+}
+
+/**
+ * Send uniforms to the shader.
+ */
+void Model::sendUniforms(const Shader& shader) const
+{
+	shader.setUniformMatrix4fv("model", modelMatrix);
+
+	shader.setUniform1i("effect", fragmentSettings.noiseEffect);
 }
 
 /**

@@ -10,12 +10,27 @@
 class Model
 {
 	public:
+		enum NoiseType
+		{
+			GRASS = 0,
+			WOOD = 1,
+			WATER = 2,
+			NONE
+		};
+
+		struct FragmentSettings
+		{
+			NoiseType noiseEffect;
+
+		};
+
 		Model(const std::string &objPath);
 		~Model();
 		void draw(const Shader& shader) const;
 		void update();
 		void rotate(const glm::vec3 &rotate);
 		void scale(float scale);
+		FragmentSettings fragmentSettings;
 
 	private:
 		std::vector<std::unique_ptr<Mesh>> meshes;
@@ -26,6 +41,7 @@ class Model
 		float m_scale;				// scale to apply to model
 		glm::vec3 m_translation;	// translation vector
 
+		void sendUniforms(const Shader& shader) const;
 		void extractDataFromNode(const aiScene* scene, const aiNode* node);
 		void scaleToViewport();
 };

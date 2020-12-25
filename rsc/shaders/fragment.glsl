@@ -325,7 +325,7 @@ void main()
 	{
 		textureCol = wood();
 	}
-	else					// water
+	else if (effect == 2)	// water
 	{
 		textureCol = vec4(0.1, 0.5, 0.8, 0.5);	// blue
 		// Add some noise to the normal vector but keep it cyclic.

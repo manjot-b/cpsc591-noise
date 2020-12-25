@@ -18,6 +18,7 @@ Renderer::Renderer() :
 	shader = std::make_unique<Shader>("shaders/vertex.glsl", "shaders/fragment.glsl");
 	shader->link();
 	loadModels();	
+	setupModels();
 	
 	perspective = glm::perspective(glm::radians(45.0f), float(width)/height, 0.1f, 100.0f);
 	shader->use();
@@ -33,8 +34,6 @@ Renderer::Renderer() :
 	shuffle(perm, 110);
 	shader->setUniform1iv("perm", 256, perm);
 	shader->setUniform1iv("perm[256]", 256, perm);
-
-	shader->setUniform1i("effect", 0);
 
 	glUseProgram(0);	// unbind shader
 }
@@ -129,6 +128,15 @@ void Renderer::loadModels()
 	{
 		models.push_back(logs[i]);
 	}
+}
+
+void Renderer::setupModels()
+{
+	water->fragmentSettings.noiseEffect = Model::NoiseType::WATER;
+	terrain->fragmentSettings.noiseEffect = Model::NoiseType::GRASS;
+
+	for(auto& log : logs)
+		log->fragmentSettings.noiseEffect = Model::NoiseType::WOOD;
 }
 
 void Renderer::run()

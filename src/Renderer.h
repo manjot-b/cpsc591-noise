@@ -47,6 +47,7 @@ class Renderer
 		void shuffle(int perm[256], int seed);
 		void initWindow();
 		void loadModels();
+		void setupModels();
 		void processWindowInput();
 		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void mouseCallback(GLFWwindow* window, double xpos, double ypos);

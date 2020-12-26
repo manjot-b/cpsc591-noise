@@ -188,8 +188,6 @@ void Renderer::setupModels()
 
 void Renderer::run()
 {
-	bool showDemo = true;
-
 	while(!glfwWindowShouldClose(window))
 	{
 		float currentFrame = glfwGetTime();
@@ -220,14 +218,7 @@ void Renderer::run()
 		rotate = glm::vec3(0.0f);
 		scale = 1;
 		
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-		ImGui::ShowDemoWindow(&showDemo);
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		showGui();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -236,6 +227,65 @@ void Renderer::run()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+
+/*
+ * Display the ImGui and handle its events.
+ */
+void Renderer::showGui()
+{
+	auto HelpMarker = [](const char* desc) -> void
+	{
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted(desc);
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+	};
+	// Start the Dear ImGui frame
+	bool showDemo = true;
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	ImGui::ShowDemoWindow(&showDemo);
+
+	ImGui::Begin("Fragment Shader Settings");
+	if (ImGui::CollapsingHeader("Grass/Terrain", ImGuiTreeNodeFlags_None))
+	{
+		Model::FragmentSettings& fs = terrain->fragmentSettings;
+		ImGui::SliderFloat("Persistence###grp", &fs.persistence, 0.1f, 1.0f);
+		ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
+		ImGui::SliderInt("Octaves###gro", &fs.octaveCount, 1, 16);
+		ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
+		ImGui::SliderInt("Octave Start###gros", &fs.octaveStart, 0, fs.octaveCount-1);
+	}
+	for (unsigned int i = 0; i < logs.size(); i++)
+	{
+		std::string header = "Wood " + std::to_string(i+1);
+		if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_None))
+		{
+			Model::FragmentSettings& fs = logs[i]->fragmentSettings;
+			std::string persistence = "Persistence###wp " + std::to_string(i);
+			std::string octaves = "Octaves###oc" + std::to_string(i);
+			std::string octavesStart = "Octaves###ocs" + std::to_string(i);
+
+
+			ImGui::SliderFloat(persistence.c_str(), &fs.persistence, 0.1f, 1.0f);
+			ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
+			ImGui::SliderInt(octaves.c_str(), &fs.octaveCount, 1, 16);
+			ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
+			ImGui::SliderInt(octavesStart.c_str(), &fs.octaveStart, 0, fs.octaveCount-1);
+		}
+	}
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 /*

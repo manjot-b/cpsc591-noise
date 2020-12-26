@@ -50,6 +50,7 @@ class Renderer
 		void initImGui();
 		void loadModels();
 		void setupModels();
+		void showGui();
 		void processWindowInput();
 		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void mouseCallback(GLFWwindow* window, double xpos, double ypos);

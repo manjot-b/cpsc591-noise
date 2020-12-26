@@ -2,6 +2,9 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 #include <iostream>
 #include <filesystem>
@@ -10,11 +13,12 @@
 #include "Renderer.h"
 
 Renderer::Renderer() :
-	rotate(0), scale(1), camera(glm::vec3(0,5,12)),
+	showCursor(false), rotate(0), scale(1), camera(glm::vec3(0,5,12)),
 	firstMouse(true), lastX(width / 2.0f), lastY(height / 2.0f),
 	shiftPressed(false), deltaTime(0.0f), lastFrame(0.0f)
 {
 	initWindow();
+	initImGui();
 	shader = std::make_unique<Shader>("shaders/vertex.glsl", "shaders/fragment.glsl");
 	shader->link();
 	loadModels();	
@@ -99,6 +103,23 @@ void Renderer::initWindow()
 
 }
 
+void Renderer::initImGui()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	//ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+}
+
 void Renderer::loadModels()
 {
 	namespace fs = std::filesystem;
@@ -167,6 +188,7 @@ void Renderer::setupModels()
 
 void Renderer::run()
 {
+	bool showDemo = true;
 
 	while(!glfwWindowShouldClose(window))
 	{
@@ -197,10 +219,23 @@ void Renderer::run()
 
 		rotate = glm::vec3(0.0f);
 		scale = 1;
+		
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+		ImGui::ShowDemoWindow(&showDemo);
 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 /*
@@ -290,7 +325,6 @@ void Renderer::processWindowInput()
 	{
 		scale /= scaleSpeed;
 	}
-
 }
 
 /*
@@ -299,7 +333,7 @@ void Renderer::processWindowInput()
  */ 
 void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	//Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+	Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
 	
 	if (action == GLFW_PRESS)
 	{
@@ -307,6 +341,13 @@ void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action
 		{
 			case GLFW_KEY_ESCAPE:
 				glfwSetWindowShouldClose(window, true);
+				break;
+			case GLFW_KEY_SPACE:
+				renderer->showCursor = !renderer->showCursor;
+				if (renderer->showCursor)
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				else
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				break;
 
 			// Select model
@@ -328,19 +369,23 @@ void Renderer::keyCallback(GLFWwindow* window, int key, int scancode, int action
 void Renderer::mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
 	Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+	// if cursor is showing we want to control ImGui, so don't move camera around.
+	if (!renderer->showCursor)
+	{
 
-    if (renderer->firstMouse)
-    {
-        renderer->lastX = xpos;
-        renderer->lastY = ypos;
-        renderer->firstMouse = false;
-    }
+		if (renderer->firstMouse)
+		{
+			renderer->lastX = xpos;
+			renderer->lastY = ypos;
+			renderer->firstMouse = false;
+		}
 
-    float xoffset = xpos - renderer->lastX;
-    float yoffset = renderer->lastY - ypos; // reversed since y-coordinates go from bottom to top
+		float xoffset = xpos - renderer->lastX;
+		float yoffset = renderer->lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-    renderer->lastX = xpos;
-    renderer->lastY = ypos;
+		renderer->lastX = xpos;
+		renderer->lastY = ypos;
 
-    renderer->camera.processMouseMovement(xoffset, yoffset);
+		renderer->camera.processMouseMovement(xoffset, yoffset);
+	}
 }

@@ -30,6 +30,7 @@ class Renderer
 		
 		const unsigned int height = 800;
 		const unsigned int width = 800;
+		bool showCursor;
 
 		glm::vec3 rotate;
 		float scale;
@@ -46,6 +47,7 @@ class Renderer
 
 		void shuffle(int perm[256], int seed);
 		void initWindow();
+		void initImGui();
 		void loadModels();
 		void setupModels();
 		void processWindowInput();

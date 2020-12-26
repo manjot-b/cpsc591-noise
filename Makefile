@@ -6,10 +6,16 @@ OBJDIR=obj
 BINDIR=bin
 RSCDIR=rsc
 LIBDIR=lib
+
+IMGUIDIR=imgui
+IMGUISRCDIR=$(SRCDIR)/$(IMGUIDIR)
+IMGUIINCDIR=$(SRCDIR)
+
 OBJS = $(patsubst $(SRCDIR)%.cpp,$(OBJDIR)%.o,$(wildcard $(SRCDIR)/*.cpp))
+OBJS += $(patsubst $(IMGUISRCDIR)/%.cpp,$(OBJDIR)/$(IMGUIDIR)/%.o,$(wildcard $(IMGUISRCDIR)/*.cpp))
 
 CXX=g++
-CXXFLAGS=-Wall -isystem $(INCDIR) -c -std=c++17 -g
+CXXFLAGS=-Wall -isystem $(INCDIR) -isystem $(IMGUIINCDIR) -c -std=c++17 -g
 LIBS=$(shell pkg-config --static --libs glfw3 gl) -lassimp
 #LIBS=-lGL -lGLU -lglfw -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor
 LDFLAGS=-L$(LIBDIR) $(LIBS) -Wl,-rpath,$(PWD)/$(LIBDIR)
@@ -33,7 +39,10 @@ $(BINDIR)/$(EXECUTABLE): $(OBJS)
 	ln -sf $(PWD)/rsc/* $(PWD)/bin 
 	$(CXX) -o $@ $^ $(LDFLAGS) 
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp 
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	mkdir -p $(OBJDIR)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
+$(OBJDIR)/$(IMGUIDIR)/%.o: $(IMGUISRCDIR)/%.cpp
+	mkdir -p $(OBJDIR)/imgui
+	$(CXX) $(CXXFLAGS) $< -o $@

@@ -134,7 +134,7 @@ void Renderer::setupModels()
 {
 	// Water
 	water->fragmentSettings.noiseEffect = Model::NoiseType::WATER;
-	water->fragmentSettings.phaseSpeed = 1.8;
+	water->fragmentSettings.phaseSpeed = 1.4;
 	water->scale(20);
 	water->translate(glm::vec3(0,-2.77,0));
 

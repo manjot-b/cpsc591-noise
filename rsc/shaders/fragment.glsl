@@ -2,6 +2,7 @@
 
 #define SQRT2 1.41421356273
 #define SQRT3 1.73205080757
+#define WAVECENTERS 20 
 
 in vec3 modelPos;
 in vec3 normal;
@@ -283,23 +284,23 @@ vec4 wood()
 
 vec3 waves(vec3 vec)
 {
-	vec3[8] centers;
-	float[8] freqs;
-	float maxFreq = 20;
-	float minFreq = 10;
+	vec3[WAVECENTERS] centers;
+	float[WAVECENTERS] freqs;
+	float maxFreq = 200;
+	float minFreq = 50;
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < WAVECENTERS; i++)
 	{
 		centers[i] = normalize(diffNoise(i * vec3(100,0,0)));
-		freqs[i] = noise(vec2(i+0.12, i+0.21)) * maxFreq * 0.5 + minFreq;
+		freqs[i] = noise(vec2(i+0.12, i+0.21)) * (maxFreq - minFreq) / maxFreq + minFreq;
 	}
 
 	vec3 displacement = vec3(0);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < WAVECENTERS; i++)
 	{
 		vec3 toPoint = vec - centers[i];
-		displacement += normalize(toPoint) * cos(length(toPoint)*freqs[i] + time*phaseSpeed) /freqs[i];
+		displacement += normalize(toPoint) * cos(length(toPoint)*freqs[i] - time*phaseSpeed);
 	}
 	return displacement;
 }

@@ -90,6 +90,10 @@ void Model::sendUniforms(const Shader& shader) const
 	shader.setUniformMatrix4fv("model", modelMatrix);
 
 	shader.setUniform1i("effect", fragmentSettings.noiseEffect);
+	shader.setUniform1f("persistence", fragmentSettings.persistence);
+	shader.setUniform1i("octaveCount", fragmentSettings.octaveCount);
+	shader.setUniform1i("octaveStart", fragmentSettings.octaveStart);
+	shader.setUniform1f("phaseSpeed", fragmentSettings.phaseSpeed);
 }
 
 /**

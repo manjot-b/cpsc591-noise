@@ -21,7 +21,10 @@ class Model
 		struct FragmentSettings
 		{
 			NoiseType noiseEffect;
-
+			float persistence;
+			int octaveCount;
+			int octaveStart;
+			float phaseSpeed;
 		};
 
 		Model(const std::string &objPath);

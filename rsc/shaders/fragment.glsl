@@ -10,7 +10,12 @@ in vec3 toLight;
 uniform int[512] perm;
 uniform float time;
 uniform vec3 toCamera;
+
 uniform int effect;	// Chooses a perlin texture to apply.
+uniform float persistence;
+uniform int octaveCount;
+uniform int octaveStart;
+uniform float phaseSpeed;
 
 out vec4 fragColor;
 
@@ -252,8 +257,7 @@ vec4 grass()
 	vec3 brown = vec3(0.545, 0.271, 0.075);
 	vec3 final;
 
-	float persistence = 7/16.0f;
-	float turbulence = turbulence(modelPos, persistence, 4, 1, 25);
+	float turbulence = turbulence(modelPos, persistence, octaveCount, octaveStart, 25);
 	// The persistance from the first octave will contribute
 	// the most to the total noise.
 	if (turbulence < persistence * 0.75)
@@ -267,7 +271,7 @@ vec4 grass()
 vec4 wood()
 {
 	// Add some turbulance to the distance so that we get curvy rings.
-	float turbulence = turbulence(modelPos, 2/16.0, 3, 0, 25);
+	float turbulence = turbulence(modelPos, persistence, octaveCount, octaveStart, 25);
 	float dist = length(modelPos.xz) + turbulence;
 	float value = (cos(dist * 80) + 1 ) * 0.5f;
 	value = pow(value, 3);
@@ -289,8 +293,6 @@ vec3 waves(vec3 vec)
 		centers[i] = normalize(diffNoise(i * vec3(100,0,0)));
 		freqs[i] = noise(vec2(i+0.12, i+0.21)) * maxFreq * 0.5 + minFreq;
 	}
-
-	float phaseSpeed = 1.8;
 
 	vec3 displacement = vec3(0);
 

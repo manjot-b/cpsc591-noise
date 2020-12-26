@@ -134,16 +134,25 @@ void Renderer::setupModels()
 {
 	// Water
 	water->fragmentSettings.noiseEffect = Model::NoiseType::WATER;
+	water->fragmentSettings.phaseSpeed = 1.8;
 	water->scale(20);
 	water->translate(glm::vec3(0,-2.77,0));
 
 	// Terrain
 	terrain->fragmentSettings.noiseEffect = Model::NoiseType::GRASS;
+	terrain->fragmentSettings.persistence = 7/16.0f;
+	terrain->fragmentSettings.octaveCount = 4;
+	terrain->fragmentSettings.octaveStart = 1;
 	terrain->scale(10);
 
 	// Logs
 	for(auto& log : logs)
+	{
 		log->fragmentSettings.noiseEffect = Model::NoiseType::WOOD;
+		log->fragmentSettings.persistence = 2/16.0f;
+		log->fragmentSettings.octaveCount = 3;
+		log->fragmentSettings.octaveStart = 0;
+	}
 
 	logs[0]->scale(0.5);
 	logs[0]->translate(glm::vec3(-7,1,0));

@@ -31,6 +31,9 @@ class Model
 			int octaveCount;
 			int octaveStart;
 
+			// Wood parameters.
+			float ringFrequency;
+
 			// Wave parameters
 			int waveCenters;
 			float minFrequency;

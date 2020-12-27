@@ -95,6 +95,8 @@ void Model::sendUniforms(const Shader& shader) const
 	shader.setUniform1i("octaveCount", fragmentSettings.octaveCount);
 	shader.setUniform1i("octaveStart", fragmentSettings.octaveStart);
 
+	shader.setUniform1f("ringFreq", fragmentSettings.ringFrequency);
+
 	shader.setUniform1i("waveCenters", fragmentSettings.waveCenters);
 	shader.setUniform1f("minFreq", fragmentSettings.minFrequency);
 	shader.setUniform1f("maxFreq", fragmentSettings.maxFrequency);

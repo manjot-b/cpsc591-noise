@@ -17,6 +17,7 @@ uniform int effect;	// Chooses a perlin texture to apply.
 uniform float persistence;
 uniform int octaveCount;
 uniform int octaveStart;
+uniform float ringFreq;
 
 uniform float minFreq;
 uniform float maxFreq;
@@ -279,7 +280,7 @@ vec4 wood()
 	// Add some turbulance to the distance so that we get curvy rings.
 	float turbulence = turbulence(modelPos, persistence, octaveCount, octaveStart, 25);
 	float dist = length(modelPos.xz) + turbulence;
-	float value = (cos(dist * 80) + 1 ) * 0.5f;
+	float value = (cos(dist * ringFreq) + 1 ) * 0.5f;
 	value = pow(value, 3);
 
 	vec3 light = vec3(0.2941, 0.2118, 0.1294);

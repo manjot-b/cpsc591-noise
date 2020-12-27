@@ -192,6 +192,7 @@ void Renderer::setupModels()
 	{
 		log->fragmentSettings.noiseEffect = Model::NoiseType::WOOD;
 		log->fragmentSettings.persistence = 2/16.0f;
+		log->fragmentSettings.ringFrequency = 80;
 		log->fragmentSettings.octaveCount = 3;
 		log->fragmentSettings.octaveStart = 0;
 	}
@@ -208,6 +209,7 @@ void Renderer::setupModels()
 	{
 		model->fragmentSettings.noiseEffect = Model::NoiseType::WOOD;
 		model->fragmentSettings.persistence = 2/16.0f;
+		model->fragmentSettings.ringFrequency = 80;
 		model->fragmentSettings.octaveCount = 3;
 		model->fragmentSettings.octaveStart = 0;
 		model->fragmentSettings.phaseSpeed = 1.4;
@@ -308,12 +310,15 @@ void Renderer::showGui()
 		{
 			Model::FragmentSettings& fs = logs[i]->fragmentSettings;
 			std::string persistence = "Persistence###wp " + std::to_string(i);
-			std::string octaves = "Octaves###oc" + std::to_string(i);
-			std::string octavesStart = "Octaves###ocs" + std::to_string(i);
+			std::string ringFreq = "Ring Frequency###wf " + std::to_string(i);
+			std::string octaves = "Octaves###woc" + std::to_string(i);
+			std::string octavesStart = "Octaves###wocs" + std::to_string(i);
 
 
 			ImGui::SliderFloat(persistence.c_str(), &fs.persistence, 0.1, 1.0);
 			ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
+			ImGui::SliderFloat(ringFreq.c_str(), &fs.ringFrequency, 0.1, 100.0);
+
 			ImGui::SliderInt(octaves.c_str(), &fs.octaveCount, 1, 16);
 			ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
 			ImGui::SliderInt(octavesStart.c_str(), &fs.octaveStart, 0, fs.octaveCount-1);
@@ -339,6 +344,8 @@ void Renderer::showGui()
 		ImGui::SliderFloat("Persistence###demop", &fs.persistence, 0.1, 1.0);
 		ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
 
+		ImGui::SliderFloat("Ring Frequency###demorf", &fs.ringFrequency, 0.1, 100.0);
+
 		ImGui::SliderInt("Octaves###demoo", &fs.octaveCount, 1, 16);
 		ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
 
@@ -354,6 +361,7 @@ void Renderer::showGui()
 			Model::FragmentSettings& demoFs = model->fragmentSettings;
 			demoFs.noiseEffect = fs.noiseEffect;
 			demoFs.persistence = fs.persistence;
+			demoFs.ringFrequency = fs.ringFrequency;
 			demoFs.octaveCount = fs.octaveCount;
 			demoFs.octaveStart = fs.octaveStart;
 			demoFs.waveCenters = fs.waveCenters;

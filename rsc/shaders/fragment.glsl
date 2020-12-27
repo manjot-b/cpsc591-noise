@@ -240,24 +240,6 @@ float turbulence(vec3 vec, float persistence, int octaves, int start, float offs
 	return total;
 }
 
-/**
- * Same as the normal turbulence function but uses the differential of the noise
- * function rather than the noise function directly to return the gradient at the
- * given point.
- */
-vec3 diffTurbulence(vec3 vec, int octaves, int start, float offset)
-{
-	// offset so we are not at (0,0). Noise function does not
-	// behave correctly near the origin.
-	vec3 total = vec3(0);
-	for (int i = start; i < octaves; i++)
-	{
-		float freq = pow(2, i);
-		total += diffNoise(modelPos * freq + offset);
-	}
-	return total;
-}
-
 vec4 grass()
 {
 	vec3 green = vec3(0.133, 0.545, 0.133);

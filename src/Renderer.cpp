@@ -207,10 +207,10 @@ void Renderer::setupModels()
 	// Demo models
 	for(auto& model : demoModels)
 	{
-		model->fragmentSettings.noiseEffect = Model::NoiseType::WOOD;
-		model->fragmentSettings.persistence = 2/16.0f;
+		model->fragmentSettings.noiseEffect = Model::NoiseType::BLACK_WHITE;
+		model->fragmentSettings.persistence = 1;
 		model->fragmentSettings.ringFrequency = 80;
-		model->fragmentSettings.octaveCount = 3;
+		model->fragmentSettings.octaveCount = 1;
 		model->fragmentSettings.octaveStart = 0;
 		model->fragmentSettings.phaseSpeed = 1.4;
 		model->fragmentSettings.minFrequency = 50;
@@ -336,7 +336,12 @@ void Renderer::showGui()
 
 	if (ImGui::CollapsingHeader("Demo Models", ImGuiTreeNodeFlags_None))
 	{
-		const char* noiseNames[Model::NoiseType::COUNT] = { "Grass/Terrain", "Wood", "Water", "None" };
+		const char* noiseNames[Model::NoiseType::COUNT] = {
+			"Grass/Terrain",
+			"Wood",
+			"Water",
+			"Black/White",
+			"None"};
 		Model::FragmentSettings& fs = demoModels[0]->fragmentSettings;
 		//int noiseEffect = fs.noiseEffect;
 		ImGui::SliderInt("Texture", reinterpret_cast<int*>(&fs.noiseEffect), 0, Model::NoiseType::COUNT - 1, noiseNames[fs.noiseEffect]);
@@ -344,12 +349,12 @@ void Renderer::showGui()
 		ImGui::SliderFloat("Persistence###demop", &fs.persistence, 0.1, 1.0);
 		ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
 
-		ImGui::SliderFloat("Ring Frequency###demorf", &fs.ringFrequency, 0.1, 100.0);
-
 		ImGui::SliderInt("Octaves###demoo", &fs.octaveCount, 1, 16);
 		ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
 
 		ImGui::SliderInt("Octave Start###demoos", &fs.octaveStart, 0, fs.octaveCount-1);
+
+		ImGui::SliderFloat("Ring Frequency###demorf", &fs.ringFrequency, 0.1, 100.0);
 
 		ImGui::SliderInt("Wave Centers###demowc", &fs.waveCenters, 0, 20);
 		ImGui::SliderFloat("Wave Speed###demows", &fs.phaseSpeed, 0, 3.0);

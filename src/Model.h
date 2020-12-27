@@ -15,6 +15,7 @@ class Model
 			GRASS = 0,
 			WOOD,
 			WATER,
+			BLACK_WHITE,
 			NONE,
 			/*
 			 * COUNT is not a NoiseType. It stores how many enums there are.

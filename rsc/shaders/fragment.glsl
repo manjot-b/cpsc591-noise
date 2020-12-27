@@ -330,6 +330,11 @@ void main()
 		float dampedFactor = pow(specularFactor, shininess);
 		specular = dampedFactor * specularCoeff * vec3(1.0);
 	}
+	else if (effect == 3) // black white noise
+	{
+		float n = turbulence(modelPos, persistence, octaveCount, octaveStart, 25);
+		textureCol = vec4(n,n,n,1);
+	}
 
 	vec4 totalLight = vec4(ambient + diffuse , 1);
 	fragColor = textureCol * totalLight + vec4(specular,0);

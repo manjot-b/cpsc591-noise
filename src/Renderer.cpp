@@ -156,6 +156,9 @@ void Renderer::setupModels()
 	// Water
 	water->fragmentSettings.noiseEffect = Model::NoiseType::WATER;
 	water->fragmentSettings.phaseSpeed = 1.4;
+	water->fragmentSettings.minFrequency = 50;
+	water->fragmentSettings.maxFrequency = 200;
+	water->fragmentSettings.waveCenters = 20;
 	water->scale(20);
 	water->translate(glm::vec3(0,-2.77,0));
 
@@ -254,15 +257,17 @@ void Renderer::showGui()
 	ImGui::ShowDemoWindow(&showDemo);
 
 	ImGui::Begin("Fragment Shader Settings");
+
 	if (ImGui::CollapsingHeader("Grass/Terrain", ImGuiTreeNodeFlags_None))
 	{
 		Model::FragmentSettings& fs = terrain->fragmentSettings;
-		ImGui::SliderFloat("Persistence###grp", &fs.persistence, 0.1f, 1.0f);
+		ImGui::SliderFloat("Persistence###grp", &fs.persistence, 0.1, 1.0);
 		ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
 		ImGui::SliderInt("Octaves###gro", &fs.octaveCount, 1, 16);
 		ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
 		ImGui::SliderInt("Octave Start###gros", &fs.octaveStart, 0, fs.octaveCount-1);
 	}
+
 	for (unsigned int i = 0; i < logs.size(); i++)
 	{
 		std::string header = "Wood " + std::to_string(i+1);
@@ -274,12 +279,21 @@ void Renderer::showGui()
 			std::string octavesStart = "Octaves###ocs" + std::to_string(i);
 
 
-			ImGui::SliderFloat(persistence.c_str(), &fs.persistence, 0.1f, 1.0f);
+			ImGui::SliderFloat(persistence.c_str(), &fs.persistence, 0.1, 1.0);
 			ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
 			ImGui::SliderInt(octaves.c_str(), &fs.octaveCount, 1, 16);
 			ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
 			ImGui::SliderInt(octavesStart.c_str(), &fs.octaveStart, 0, fs.octaveCount-1);
 		}
+	}
+
+	if (ImGui::CollapsingHeader("Waves", ImGuiTreeNodeFlags_None))
+	{
+		Model::FragmentSettings& fs = water->fragmentSettings;
+		ImGui::SliderInt("Wave Centers", &fs.waveCenters, 0, 20);
+		ImGui::SliderFloat("Wave Speed", &fs.phaseSpeed, 0, 3.0);
+		ImGui::SliderFloat("Min Frequency", &fs.minFrequency, 1, fs.maxFrequency);
+		ImGui::SliderFloat("Max Frequency", &fs.maxFrequency, 0.01, 500);
 	}
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();

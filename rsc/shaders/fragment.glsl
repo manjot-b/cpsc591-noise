@@ -2,7 +2,7 @@
 
 #define SQRT2 1.41421356273
 #define SQRT3 1.73205080757
-#define WAVECENTERS 20 
+#define MAX_WAVE_CENTERS 20 
 
 in vec3 modelPos;
 in vec3 normal;
@@ -13,10 +13,15 @@ uniform float time;
 uniform vec3 toCamera;
 
 uniform int effect;	// Chooses a perlin texture to apply.
+
 uniform float persistence;
 uniform int octaveCount;
 uniform int octaveStart;
+
+uniform float minFreq;
+uniform float maxFreq;
 uniform float phaseSpeed;
+uniform int waveCenters;
 
 out vec4 fragColor;
 
@@ -284,20 +289,18 @@ vec4 wood()
 
 vec3 waves(vec3 vec)
 {
-	vec3[WAVECENTERS] centers;
-	float[WAVECENTERS] freqs;
-	float maxFreq = 200;
-	float minFreq = 50;
+	vec3[MAX_WAVE_CENTERS] centers;
+	float[MAX_WAVE_CENTERS] freqs;
 
-	for (int i = 0; i < WAVECENTERS; i++)
+	for (int i = 0; i < waveCenters; i++)
 	{
 		centers[i] = normalize(diffNoise(i * vec3(100,0,0)));
-		freqs[i] = noise(vec2(i+0.12, i+0.21)) * (maxFreq - minFreq) / maxFreq + minFreq;
+		freqs[i] = noise(vec2(i+0.12, i+0.91)) * (maxFreq - minFreq) / maxFreq + minFreq;
 	}
 
 	vec3 displacement = vec3(0);
 
-	for (int i = 0; i < WAVECENTERS; i++)
+	for (int i = 0; i < waveCenters; i++)
 	{
 		vec3 toPoint = vec - centers[i];
 		displacement += normalize(toPoint) * cos(length(toPoint)*freqs[i] - time*phaseSpeed);

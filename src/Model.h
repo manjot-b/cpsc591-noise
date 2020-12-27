@@ -21,9 +21,16 @@ class Model
 		struct FragmentSettings
 		{
 			NoiseType noiseEffect;
+
+			// Turbulence parameters.
 			float persistence;
 			int octaveCount;
 			int octaveStart;
+
+			// Wave parameters
+			int waveCenters;
+			float minFrequency;
+			float maxFrequency;
 			float phaseSpeed;
 		};
 

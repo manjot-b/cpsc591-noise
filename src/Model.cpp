@@ -90,9 +90,14 @@ void Model::sendUniforms(const Shader& shader) const
 	shader.setUniformMatrix4fv("model", modelMatrix);
 
 	shader.setUniform1i("effect", fragmentSettings.noiseEffect);
+
 	shader.setUniform1f("persistence", fragmentSettings.persistence);
 	shader.setUniform1i("octaveCount", fragmentSettings.octaveCount);
 	shader.setUniform1i("octaveStart", fragmentSettings.octaveStart);
+
+	shader.setUniform1i("waveCenters", fragmentSettings.waveCenters);
+	shader.setUniform1f("minFreq", fragmentSettings.minFrequency);
+	shader.setUniform1f("maxFreq", fragmentSettings.maxFrequency);
 	shader.setUniform1f("phaseSpeed", fragmentSettings.phaseSpeed);
 }
 

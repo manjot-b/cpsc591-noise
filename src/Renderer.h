@@ -27,6 +27,7 @@ class Renderer
 		std::shared_ptr<Model> water;
 		std::vector<std::shared_ptr<Model>> logs;
 		std::vector<std::shared_ptr<Model>> models;
+		std::vector<std::shared_ptr<Model>> demoModels;
 		
 		const unsigned int height = 800;
 		const unsigned int width = 800;
@@ -49,6 +50,7 @@ class Renderer
 		void initWindow();
 		void initImGui();
 		void loadModels();
+		void loadModel(const std::string path, std::shared_ptr<Model>& model);
 		void setupModels();
 		void showGui();
 		void processWindowInput();

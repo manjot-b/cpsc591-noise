@@ -13,9 +13,13 @@ class Model
 		enum NoiseType
 		{
 			GRASS = 0,
-			WOOD = 1,
-			WATER = 2,
-			NONE
+			WOOD,
+			WATER,
+			NONE,
+			/*
+			 * COUNT is not a NoiseType. It stores how many enums there are.
+			 */
+			COUNT
 		};
 
 		struct FragmentSettings

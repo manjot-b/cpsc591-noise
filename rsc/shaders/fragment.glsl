@@ -321,7 +321,7 @@ void main()
 
 	vec3 specular = vec3(0);
 
-	vec4 textureCol;
+	vec4 textureCol = vec4(1);
 
 	if (effect == 0)	// terrain
 	{

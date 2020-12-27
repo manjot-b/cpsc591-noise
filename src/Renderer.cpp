@@ -13,6 +13,7 @@
 #include "Renderer.h"
 
 Renderer::Renderer() :
+	logs(3), demoModels(4),
 	showCursor(false), rotate(0), scale(1), camera(glm::vec3(0,5,12)),
 	firstMouse(true), lastX(width / 2.0f), lastY(height / 2.0f),
 	shiftPressed(false), deltaTime(0.0f), lastFrame(0.0f)
@@ -29,7 +30,7 @@ Renderer::Renderer() :
 	shader->setUniformMatrix4fv("perspective", perspective);
 	shader->setUniformMatrix4fv("view", camera.getViewMatrix());
 
-	glm::vec3 lightPos = glm::vec3(5.0, 25.0, -20.0);
+	glm::vec3 lightPos = glm::vec3(-5.0, 25.0, 20.0);
 	shader->setUniform3fv("lightPos", lightPos);
 
 	int perm[256];
@@ -124,31 +125,48 @@ void Renderer::loadModels()
 {
 	namespace fs = std::filesystem;
 	const std::string dir = "models/";
+
 	const std::string logPath = dir + "log.obj";
 	const std::string terrainPath = dir + "terrain-3.obj";
 	const std::string waterPath = dir + "water.obj";
 
-	unsigned int logCount = 3;
-	for (unsigned int i = 0; i < logCount; i++)
-	{
-		std::cout << "Loading " << logPath << "..." << std::flush;
-		logs.push_back(std::make_unique<Model>(logPath));
-		std::cout << "Done!\n"; 
-	}
-	std::cout << "Loading " << waterPath << "..." << std::flush;
-	water = std::make_unique<Model>(waterPath);
-	std::cout << "Done!\n"; 
+	const std::string cubePath = dir + "cube.obj";
+	const std::string spherePath = dir + "sphere.obj";
+	const std::string teapotPath = dir + "teapot.obj";
+	const std::string bunnyPath = dir + "bunny.obj";
 
-	std::cout << "Loading " << terrainPath << "..." << std::flush;
-	terrain = std::make_unique<Model>(terrainPath);
-	std::cout << "Done!\n"; 
+	for (auto& log : logs)
+	{
+		loadModel(logPath, log);
+	}
+
+	loadModel(waterPath, water);
+	loadModel(terrainPath, terrain);
+
+	loadModel(cubePath, demoModels[0]);
+	loadModel(spherePath, demoModels[1]);
+	loadModel(teapotPath, demoModels[2]);
+	loadModel(bunnyPath, demoModels[3]);
+
 
 	models.push_back(water);
 	models.push_back(terrain);
-	for (unsigned int i = 0; i < logCount; i++)
+	for (auto& log : logs)
 	{
-		models.push_back(logs[i]);
+		models.push_back(log);
 	}
+
+	for (auto& model : demoModels)
+	{
+		models.push_back(model);
+	}
+}
+
+void Renderer::loadModel(const std::string path, std::shared_ptr<Model>& model)
+{
+	std::cout << "Loading " << path << "..." << std::flush;
+	model = std::make_shared<Model>(path);
+	std::cout << "Done!\n"; 
 }
 
 void Renderer::setupModels()
@@ -184,6 +202,23 @@ void Renderer::setupModels()
 	logs[1]->translate(glm::vec3(-3,1.5,15));
 	logs[2]->scale(0.35);
 	logs[2]->translate(glm::vec3(14,2.15,5));
+
+	// Demo models
+	for(auto& model : demoModels)
+	{
+		model->fragmentSettings.noiseEffect = Model::NoiseType::WOOD;
+		model->fragmentSettings.persistence = 2/16.0f;
+		model->fragmentSettings.octaveCount = 3;
+		model->fragmentSettings.octaveStart = 0;
+		model->fragmentSettings.phaseSpeed = 1.4;
+		model->fragmentSettings.minFrequency = 50;
+		model->fragmentSettings.maxFrequency = 200;
+		model->fragmentSettings.waveCenters = 20;
+	}
+		demoModels[0]->translate(glm::vec3(-4, 5, 0));
+		demoModels[1]->translate(glm::vec3(-5, 12, 0));
+		demoModels[2]->translate(glm::vec3(0, 30, 0));
+		demoModels[3]->translate(glm::vec3(5, 15, -0.1));
 
 	for(auto& model : models)
 		model->update();
@@ -250,11 +285,9 @@ void Renderer::showGui()
 		}
 	};
 	// Start the Dear ImGui frame
-	bool showDemo = true;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::ShowDemoWindow(&showDemo);
 
 	ImGui::Begin("Fragment Shader Settings");
 
@@ -294,6 +327,40 @@ void Renderer::showGui()
 		ImGui::SliderFloat("Wave Speed", &fs.phaseSpeed, 0, 3.0);
 		ImGui::SliderFloat("Min Frequency", &fs.minFrequency, 1, fs.maxFrequency);
 		ImGui::SliderFloat("Max Frequency", &fs.maxFrequency, 0.01, 500);
+	}
+
+	if (ImGui::CollapsingHeader("Demo Models", ImGuiTreeNodeFlags_None))
+	{
+		const char* noiseNames[Model::NoiseType::COUNT] = { "Grass/Terrain", "Wood", "Water", "None" };
+		Model::FragmentSettings& fs = demoModels[0]->fragmentSettings;
+		//int noiseEffect = fs.noiseEffect;
+		ImGui::SliderInt("Texture", reinterpret_cast<int*>(&fs.noiseEffect), 0, Model::NoiseType::COUNT - 1, noiseNames[fs.noiseEffect]);
+
+		ImGui::SliderFloat("Persistence###demop", &fs.persistence, 0.1, 1.0);
+		ImGui::SameLine(); HelpMarker("The ith amplitude is persistence^i.");
+
+		ImGui::SliderInt("Octaves###demoo", &fs.octaveCount, 1, 16);
+		ImGui::SameLine(); HelpMarker("The more octaves are added the smoother the noise will be.");
+
+		ImGui::SliderInt("Octave Start###demoos", &fs.octaveStart, 0, fs.octaveCount-1);
+
+		ImGui::SliderInt("Wave Centers###demowc", &fs.waveCenters, 0, 20);
+		ImGui::SliderFloat("Wave Speed###demows", &fs.phaseSpeed, 0, 3.0);
+		ImGui::SliderFloat("Min Frequency###demowmax", &fs.minFrequency, 1, fs.maxFrequency);
+		ImGui::SliderFloat("Max Frequency###demomin", &fs.maxFrequency, 0.01, 500);
+
+		for(auto& model : demoModels)
+		{
+			Model::FragmentSettings& demoFs = model->fragmentSettings;
+			demoFs.noiseEffect = fs.noiseEffect;
+			demoFs.persistence = fs.persistence;
+			demoFs.octaveCount = fs.octaveCount;
+			demoFs.octaveStart = fs.octaveStart;
+			demoFs.waveCenters = fs.waveCenters;
+			demoFs.phaseSpeed = fs.phaseSpeed;
+			demoFs.minFrequency = fs.minFrequency;
+			demoFs.maxFrequency = fs.maxFrequency;
+		}
 	}
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	ImGui::End();

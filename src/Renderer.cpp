@@ -375,86 +375,35 @@ void Renderer::showGui()
  */
 void Renderer::processWindowInput()
 {
-	float rotationSpeed = glm::radians(135.0f) * deltaTime;
-	float scaleSpeed = 1.0f + 1.0f * deltaTime;
-	shiftPressed = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
-
-	// Rotations
-	if (!shiftPressed)
-	{
-		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			rotate.x -= rotationSpeed;
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			rotate.x += rotationSpeed;
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		{
-			rotate.y += rotationSpeed;
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		{
-			rotate.y -= rotationSpeed;
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			rotate.z -= rotationSpeed;
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			rotate.z += rotationSpeed;
-		}
-	}
-
 	// Camera Movement
-	if (shiftPressed)
+	if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		{
-			camera.processKeyboard(Camera::Movement::FORWARD, deltaTime);
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		{
-			camera.processKeyboard(Camera::Movement::BACKWARD, deltaTime);
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		{
-			camera.processKeyboard(Camera::Movement::RIGHT, deltaTime);
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		{
-			camera.processKeyboard(Camera::Movement::LEFT, deltaTime);
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		{
-			camera.processKeyboard(Camera::Movement::UP, deltaTime);
-		}
-
-		if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		{
-			camera.processKeyboard(Camera::Movement::DOWN, deltaTime);
-		}
+		camera.processKeyboard(Camera::Movement::FORWARD, deltaTime);
 	}
 
-	// Scaling
-	if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		scale *= scaleSpeed;
+		camera.processKeyboard(Camera::Movement::BACKWARD, deltaTime);
 	}
-	if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+
+	if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		scale /= scaleSpeed;
+		camera.processKeyboard(Camera::Movement::RIGHT, deltaTime);
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		camera.processKeyboard(Camera::Movement::LEFT, deltaTime);
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		camera.processKeyboard(Camera::Movement::UP, deltaTime);
+	}
+
+	if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		camera.processKeyboard(Camera::Movement::DOWN, deltaTime);
 	}
 }
 

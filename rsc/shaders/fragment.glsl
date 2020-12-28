@@ -17,8 +17,9 @@ uniform int effect;	// Chooses a perlin texture to apply.
 uniform float persistence;
 uniform int octaveCount;
 uniform int octaveStart;
-uniform float ringFreq;
+uniform float ringFreq;	// rings frequency of wood.
 
+// Wave paramters
 uniform float minFreq;
 uniform float maxFreq;
 uniform float phaseSpeed;
@@ -73,8 +74,9 @@ vec3 getGradient3D(int cornerValue)
 }
 
 /**
- *	Computes the 2D perlin noise.
- *	Returns a value in the range [0,1].
+ * The following code was adapted from https://rtouti.github.io/graphics/perlin-noise-algorithm
+ * Computes the 2D perlin noise.
+ * Returns a value in the range [0,1].
  */
 float noise(vec2 vec)
 {
@@ -127,8 +129,12 @@ float noise(vec2 vec)
 }
 
 /**
- *	Computes the 3D perlin noise.
- *	Returns a value in the range [0,1].
+ * The following code was adapted from 
+ * 	(1) https://rtouti.github.io/graphics/perlin-noise-algorithm
+ * 	(2) https://mrl.cs.nyu.edu/~perlin/noise/
+ *
+ * Computes the 3D perlin noise.
+ * Returns a value in the range [0,1].
  */
 float noise(vec3 vec)
 {
@@ -181,9 +187,6 @@ float noise(vec3 vec)
 	float u = ease(frac.x);
 	float v = ease(frac.y);
 	float w = ease(frac.z);
-	//float u = (frac.x);
-	//float v = (frac.y);
-	//float t = (frac.z);
 	float frontVert1 = mix(dotFrontBotLeft, dotFrontTopLeft, v);
 	float frontVert2 = mix(dotFrontBotRight, dotFrontTopRight, v);
 	float frontHorz = mix(frontVert1, frontVert2, u);
@@ -198,8 +201,15 @@ float noise(vec3 vec)
 }
 
 /**
+ * The following code was adapted from
+ * Ken Perlin. 1985. An image synthesizer. SIGGRAPH Comput. Graph. 19, 3 (Jul. 1985), 287–296.
+ * DOI:10.1145/325165.325247
+ *
  * Computes the instantaneous rate of change of the noise function at
  * the given point.
+ *
+ * For any 2 points that are spaced widely apart, the differential of the noise
+ * function will be uncorrelated.
  */
 vec3 diffNoise(vec3 vec)
 {
@@ -222,6 +232,11 @@ vec3 diffNoise(vec3 vec)
 }
 
 /**
+ * The following code was adapted from
+ *	(1) Ken Perlin. 1985. An image synthesizer. SIGGRAPH Comput. Graph. 19, 3 (Jul. 1985), 287–296.
+ * 		DOI:10.1145/325165.325247
+ * 	(2) http://www.arendpeter.com/Perlin_Noise.html
+ *
  * Create turbulence at the given point. The higher the persistance
  * the more turbulence is generated. The higher the octaves the smoother
  * the final turbulance will be.
@@ -240,6 +255,14 @@ float turbulence(vec3 vec, float persistence, int octaves, int start, float offs
 	return total;
 }
 
+/**
+ * The following code was adapted from
+ *	(1) Ken Perlin. 1985. An image synthesizer. SIGGRAPH Comput. Graph. 19, 3 (Jul. 1985), 287–296.
+ * 		DOI:10.1145/325165.325247
+ * 	(2) http://www.arendpeter.com/Perlin_Noise.html
+ *
+ * Generate a grass texture. Low noise values will have dirt.
+ */
 vec4 grass()
 {
 	vec3 green = vec3(0.133, 0.545, 0.133);
@@ -257,6 +280,14 @@ vec4 grass()
 	return vec4(final, 1);
 }
 
+/**
+ * The following code was adapted from
+ *	(1) http://luthuli.cs.uiuc.edu/~daf/courses/computergraphics/week8/shading.pdf
+ *	(2) http://www.sci.utah.edu/~leenak/IndStudy_reportfall/Perlin%20Noise%20on%20GPU.html
+ *	(3) https://lodev.org/cgtutor/randomnoise.html#Wood
+ *
+ * Generates a wood texture.
+ */
 vec4 wood()
 {
 	// Add some turbulance to the distance so that we get curvy rings.
@@ -270,6 +301,13 @@ vec4 wood()
 	return vec4(mix(light, dark, value), 1);
 }
 
+/**
+ * The following code was adapted from
+ * Ken Perlin. 1985. An image synthesizer. SIGGRAPH Comput. Graph. 19, 3 (Jul. 1985), 287–296.
+ * DOI:10.1145/325165.325247
+ *
+ * Generate a displacement wave to add to the normal vector.
+ */
 vec3 waves(vec3 vec)
 {
 	vec3[MAX_WAVE_CENTERS] centers;

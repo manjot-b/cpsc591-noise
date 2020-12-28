@@ -16,7 +16,7 @@
 class Renderer
 {
 	public:
-		Renderer();
+		Renderer(int seed);
 		~Renderer();
 		void run();
 

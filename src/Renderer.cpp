@@ -12,7 +12,7 @@
 
 #include "Renderer.h"
 
-Renderer::Renderer() :
+Renderer::Renderer(int seed) :
 	logs(3), demoModels(4),
 	showCursor(false), rotate(0), scale(1), camera(glm::vec3(0,5,12)),
 	firstMouse(true), lastX(width / 2.0f), lastY(height / 2.0f),
@@ -36,7 +36,7 @@ Renderer::Renderer() :
 	int perm[256];
 	for (unsigned int i = 0; i < 256; i++)
 		perm[i] = i;
-	shuffle(perm, 110);
+	shuffle(perm, seed);
 	shader->setUniform1iv("perm", 256, perm);
 	shader->setUniform1iv("perm[256]", 256, perm);
 

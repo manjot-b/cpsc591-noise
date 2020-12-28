@@ -344,34 +344,31 @@ void main()
 
 	vec4 textureCol = vec4(1);
 
-	if (effect == 0)	// terrain
+	switch (effect)
 	{
-		textureCol = grass();
-	}
-	else if (effect == 1)	// wood
-	{
-		textureCol = wood();
-	}
-	else if (effect == 2)	// water
-	{
-		textureCol = vec4(0.1, 0.5, 0.8, 0.5);	// blue
-		// Add some noise to the normal vector but keep it cyclic.
-		vec3 waveNormal = normalize(unitNormal + waves(modelPos));
-		diffuseBrightness = max(dot(waveNormal, unitToLight), 0);
-		diffuse = vec3(1.0) * diffuseBrightness;
+		case 0:	// terrain
+			textureCol = grass(); break;
+		case 1:	// wood
+			textureCol = wood(); break;
+		case 2:	// water
+			textureCol = vec4(0.1, 0.5, 0.8, 0.5);	// blue
+			// Add some noise to the normal vector but keep it cyclic.
+			vec3 waveNormal = normalize(unitNormal + waves(modelPos));
+			diffuseBrightness = max(dot(waveNormal, unitToLight), 0);
+			diffuse = vec3(1.0) * diffuseBrightness;
 
-		float shininess = 32;
-		float specularCoeff = 0.5;
-		vec3 refl = 2 * dot(unitToLight, waveNormal) * waveNormal - unitToLight;
-		refl = normalize(refl);
-		float specularFactor = max(dot(refl, unitToCamera), 0);
-		float dampedFactor = pow(specularFactor, shininess);
-		specular = dampedFactor * specularCoeff * vec3(1.0);
-	}
-	else if (effect == 3) // black white noise
-	{
-		float n = turbulence(modelPos, persistence, octaveCount, octaveStart, 25);
-		textureCol = vec4(n,n,n,1);
+			float shininess = 32;
+			float specularCoeff = 0.5;
+			vec3 refl = 2 * dot(unitToLight, waveNormal) * waveNormal - unitToLight;
+			refl = normalize(refl);
+			float specularFactor = max(dot(refl, unitToCamera), 0);
+			float dampedFactor = pow(specularFactor, shininess);
+			specular = dampedFactor * specularCoeff * vec3(1.0);
+			break;
+		case 3: // black white noise
+			float n = turbulence(modelPos, persistence, octaveCount, octaveStart, 25);
+			textureCol = vec4(n,n,n,1);
+			break;
 	}
 
 	vec4 totalLight = vec4(ambient + diffuse , 1);

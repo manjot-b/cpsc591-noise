@@ -278,7 +278,7 @@ vec3 waves(vec3 vec)
 	for (int i = 0; i < waveCenters; i++)
 	{
 		centers[i] = normalize(diffNoise(i * vec3(100,0,0)));
-		freqs[i] = noise(vec2(i+0.12, i+0.91)) * (maxFreq - minFreq) / maxFreq + minFreq;
+		freqs[i] = noise(centers[i]) * (maxFreq - minFreq) / maxFreq + minFreq;
 	}
 
 	vec3 displacement = vec3(0);

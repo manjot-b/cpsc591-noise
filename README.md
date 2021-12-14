@@ -1,24 +1,21 @@
 # Compiling
 ## Linux
-Enter `make -jN` in the root of the project directory.
 
-You will need to make sure the following libraries are available on your system.
+Use `git` to clone the submodules first.
 
-- OpenGL
-- GLFW
-- Assimp
+	git submodule update --init --recursive --depth 1
 
-For [Assimp](https://github.com/assimp/assimp) you can clone the repo, build it following the instruction in their README and simply copy the shared library files into this projects **lib/** directory. There will only be one library file when you build Assimp and two files symbolically linked like so:
+**TO-DO:** Migrate this project over to using CMake so that the following step is not required.
 
-`libassimp (symbolic link) => libassimp.so.X (symbolic link) => libassimp.so.X.X.X (acutal lib)`
+Build both **assimp** and **glfw** by replacing the project name with the actual name of the dependancy.
 
-Make sure to maintain this linking structure. Check out this projects `Makefile` to see how I did that.
+	cd dep/<project>
+	mkdir build
+	cd build
+	cmake ..
+	make -jN
 
-You might be able to install Assimp from your distros repository if you don't want to build it yourself, but I haven't tried this so I can't say if it will work or not.
-
-GLFW requires a bunch of libraries as dependancies. Checkout the this [StackOverflow post](https://stackoverflow.com/questions/17768008/how-to-build-install-glfw-3-and-use-it-in-a-linux-project) to see which ones.
-
-Make sure to include the headers of ImGui when building. ImGui requires its header files to be in the same directory as its source files. They can be found in **src/imgui**. Add the **src** directory to the system include path when compiling.
+Come back to the root directory and enter  `make -jN`.
 
 ## Windows
 I am not sure how to get this to run on Windows but I can give some suggestions based on how the project is structured. Read about the required libraries in the *Compiling and Running on Linux* section above.
